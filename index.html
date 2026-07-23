@@ -113,6 +113,7 @@
   .prod-info{ padding:14px 16px; }
   .prod-info h4{ font-size:13.5px; font-weight:700; margin-bottom:6px; }
   .prod-info .price{ color:var(--purple-dark); font-weight:800; font-size:14px; }
+  .prod-img img { width:100%; height:100%; object-fit:cover; border-radius:0; }
 
   .download-cta{ padding:20px 0 80px; }
   .download-card{ background:linear-gradient(135deg, var(--purple), var(--purple-dark)); border-radius:26px; padding:50px 30px; text-align:center; color:#fff; }
@@ -318,13 +319,9 @@
   <div class="container">
     <div class="section-head">
       <h2>منتجات مميزة</h2>
-      <p>عيّنة من المنتجات المتاحة على براند أب (صور توضيحية مؤقتة)</p>
+      <p>أحدث المنتجات المضافة على براند أب</p>
     </div>
-    <div class="featured-grid">
-      <div class="prod-card"><div class="prod-img">طقم تقديم</div><div class="prod-info"><h4>طقم تقديم فاخر</h4><div class="price">15.000 ر.ع</div></div></div>
-      <div class="prod-card"><div class="prod-img">سلسال لؤلؤ</div><div class="prod-info"><h4>سلسال لؤلؤ أنيق</h4><div class="price">8.500 ر.ع</div></div></div>
-      <div class="prod-card"><div class="prod-img">مزهرية ديكور</div><div class="prod-info"><h4>مزهرية ديكور عصرية</h4><div class="price">6.900 ر.ع</div></div></div>
-      <div class="prod-card"><div class="prod-img">شنطة نسائية</div><div class="prod-info"><h4>شنطة يد نسائية</h4><div class="price">12.000 ر.ع</div></div></div>
+    <div class="featured-grid" id="featuredGrid">
     </div>
   </div>
 </section>
@@ -332,8 +329,8 @@
 <section class="download-cta">
   <div class="container">
     <div class="download-card">
-      <h2>حمّل تطبيق براند أب الآن</h2>
-      <p>تسوّقي أو ابدئي بيع منتجاتك بسهولة وأمان</p>
+      <h2>منتجاتك تستحق الانتشار — قريبًا على App Store وGoogle Play</h2>
+      <p>سجّلي اهتمامك الآن وكوني أول من يتسوّق ويبيع بسهولة وأمان</p>
       <div class="store-buttons">
         <a href="#" class="store-badge-html">
           <svg width="22" height="22" viewBox="0 0 24 24"><polygon points="0,0 17,12 0,24" fill="#1fb6ff"/><polygon points="0,0 21,10.5 4,11.6" fill="#33d375"/><polygon points="0,24 21,13.5 4,12.4" fill="#ffcd00"/><polygon points="21,10.5 21,13.5 4,11.6 4,12.4" fill="#ff3d57"/></svg>
@@ -367,11 +364,66 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="legal-links"><a href="https://hamedapps.com/brandup/privacy" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="terms/index.html">الشروط والأحكام</a> · <a href="refund/index.html">سياسة الإرجاع والاستبدال</a></div>
+      <div class="legal-links"><a href="privacy/index.html" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="terms/index.html">الشروط والأحكام</a> · <a href="refund/index.html">سياسة الإرجاع والاستبدال</a></div>
       <div class="copyright">© 2026 براند أب — جميع الحقوق محفوظة</div>
     </div>
   </div>
 </footer>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDBjvNU9ZbCOluCOmAkLWJxDflhLH7CR5E",
+    authDomain: "arzaaq-9a183.firebaseapp.com",
+    projectId: "arzaaq-9a183",
+    storageBucket: "arzaaq-9a183.firebasestorage.app",
+    messagingSenderId: "25787973032",
+    appId: "1:25787973032:web:e4cd4f83ffa3f28b79719d",
+    measurementId: "G-YQ22T18GTV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadFeaturedProducts() {
+    const grid = document.getElementById('featuredGrid');
+    if (!grid) return;
+    try {
+      const q = query(
+        collection(db, 'products'),
+        where('isAvailable', '==', true),
+        orderBy('createdAt', 'desc'),
+        limit(4)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) return;
+
+      grid.innerHTML = '';
+      snap.forEach((docSnap) => {
+        const p = docSnap.data();
+        const image = (p.images && p.images[0]) || '';
+        const card = document.createElement('div');
+        card.className = 'prod-card';
+        card.innerHTML = `
+          <div class="prod-img">${image ? `<img src="${image}" alt="${p.name || ''}">` : (p.name || '')}</div>
+          <div class="prod-info">
+            <h4>${p.name || ''}</h4>
+            <div class="price">${p.price ?? 0} ر.ع</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.error('featured products load error:', err);
+      // فشل الجلب: نترك القسم فاضياً بدل ما نكسر الصفحة
+    }
+  }
+
+  loadFeaturedProducts();
+</script>
 
 </body>
 </html>
