@@ -329,7 +329,7 @@
 <section class="download-cta">
   <div class="container">
     <div class="download-card">
-      <h2>منتجاتك تستحق الانتشار — قريبًا على App Store وGoogle Play</h2>
+      <h2>منتجاتك تستحق الانتشار — قريبًا على <span dir="ltr">App Store</span> و<span dir="ltr">Google Play</span></h2>
       <p>سجّلي اهتمامك الآن وكوني أول من يتسوّق ويبيع بسهولة وأمان</p>
       <div class="store-buttons">
         <a href="#" class="store-badge-html">
@@ -405,16 +405,26 @@
       snap.forEach((docSnap) => {
         const p = docSnap.data();
         const image = (p.images && p.images[0]) || '';
-        const card = document.createElement('div');
-        card.className = 'prod-card';
-        card.innerHTML = `
+        const sellerId = typeof p.sellerId === 'string' ? p.sellerId.trim() : '';
+        const inner = `
           <div class="prod-img">${image ? `<img src="${image}" alt="${p.name || ''}">` : (p.name || '')}</div>
           <div class="prod-info">
             <h4>${p.name || ''}</h4>
             <div class="price">${p.price ?? 0} ر.ع</div>
           </div>
         `;
-        grid.appendChild(card);
+        if (sellerId) {
+          const card = document.createElement('a');
+          card.className = 'prod-card';
+          card.href = `/store/${encodeURIComponent(sellerId)}`;
+          card.innerHTML = inner;
+          grid.appendChild(card);
+        } else {
+          const card = document.createElement('div');
+          card.className = 'prod-card';
+          card.innerHTML = inner;
+          grid.appendChild(card);
+        }
       });
     } catch (err) {
       console.error('featured products load error:', err);
