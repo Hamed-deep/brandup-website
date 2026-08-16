@@ -329,8 +329,8 @@
 <section class="download-cta">
   <div class="container">
     <div class="download-card">
-      <h2>منتجاتك تستحق الانتشار — قريبًا على <span dir="ltr">App Store</span> و<span dir="ltr">Google Play</span></h2>
-      <p>سجّلي اهتمامك الآن وكوني أول من يتسوّق ويبيع بسهولة وأمان</p>
+      <h2>حمّل تطبيق براند أب الآن</h2>
+      <p>تسوّقي أو ابدئي بيع منتجاتك بسهولة وأمان</p>
       <div class="store-buttons">
         <a href="#" class="store-badge-html">
           <svg width="22" height="22" viewBox="0 0 24 24"><polygon points="0,0 17,12 0,24" fill="#1fb6ff"/><polygon points="0,0 21,10.5 4,11.6" fill="#33d375"/><polygon points="0,24 21,13.5 4,12.4" fill="#ffcd00"/><polygon points="21,10.5 21,13.5 4,11.6 4,12.4" fill="#ff3d57"/></svg>
@@ -364,7 +364,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="legal-links"><a href="privacy/index.html" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="terms/index.html">الشروط والأحكام</a> · <a href="refund/index.html">سياسة الإرجاع والاستبدال</a> · <a href="delivery/index.html">سياسة التوصيل</a></div>
+      <div class="legal-links"><a href="https://hamedapps.com/brandup/privacy" target="_blank" rel="noopener">سياسة الخصوصية</a> · <a href="terms/index.html">الشروط والأحكام</a> · <a href="refund/index.html">سياسة الإرجاع والاستبدال</a></div>
       <div class="copyright">© 2026 براند أب — جميع الحقوق محفوظة</div>
     </div>
   </div>
@@ -405,26 +405,16 @@
       snap.forEach((docSnap) => {
         const p = docSnap.data();
         const image = (p.images && p.images[0]) || '';
-        const sellerId = typeof p.sellerId === 'string' ? p.sellerId.trim() : '';
-        const inner = `
+        const card = document.createElement('div');
+        card.className = 'prod-card';
+        card.innerHTML = `
           <div class="prod-img">${image ? `<img src="${image}" alt="${p.name || ''}">` : (p.name || '')}</div>
           <div class="prod-info">
             <h4>${p.name || ''}</h4>
             <div class="price">${p.price ?? 0} ر.ع</div>
           </div>
         `;
-        if (sellerId) {
-          const card = document.createElement('a');
-          card.className = 'prod-card';
-          card.href = `/store/${encodeURIComponent(sellerId)}`;
-          card.innerHTML = inner;
-          grid.appendChild(card);
-        } else {
-          const card = document.createElement('div');
-          card.className = 'prod-card';
-          card.innerHTML = inner;
-          grid.appendChild(card);
-        }
+        grid.appendChild(card);
       });
     } catch (err) {
       console.error('featured products load error:', err);
